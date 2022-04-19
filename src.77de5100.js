@@ -120,21 +120,38 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 })({"index.ts":[function(require,module,exports) {
 "use strict";
 
+var gl;
+var paused = false;
+
 window.onload = function () {
+  document.getElementById('paused').addEventListener('click', checkFluency);
   var canvas = document.querySelector("#glCanvas"); // Initialize the GL context
 
-  var gl = canvas.getContext("webgl"); // Only continue if WebGL is available and working
+  gl = canvas.getContext("webgl"); // Only continue if WebGL is available and working
 
   if (gl === null) {
     alert("Unable to initialize WebGL. Your browser or machine may not support it.");
     return;
-  } // Set clear color to black, fully opaque
+  }
 
+  window.requestAnimationFrame(step);
+};
 
-  gl.clearColor(0.0, 0.5, 0.0, 1.0); // Clear the color buffer with specified clear color
+function step() {
+  // Set clear color to black, fully opaque
+  gl.clearColor(0.0, new Date().getMilliseconds() / 1000, 0.0, 1.0); // Clear the color buffer with specified clear color
 
   gl.clear(gl.COLOR_BUFFER_BIT);
-};
+  if (paused) return;
+  window.requestAnimationFrame(step);
+}
+
+function checkFluency() {
+  var checkbox = document.getElementById('paused');
+  paused = checkbox.checked;
+  if (paused) return;
+  window.requestAnimationFrame(step);
+}
 },{}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -163,7 +180,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54998" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52151" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
