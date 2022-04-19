@@ -7,11 +7,23 @@
 </head>
 
 <body>
+    <script src="./index.ts"></script>
     <div id="container">
-        <h1>webgl canvas</h1>
+        <table>
+            <tr>
+                <td>
+                    <h1>
+                        webgl canvas
+                    </h1>
+                </td>
+                <td>
+                    <input type="checkbox" id="paused" />
+                    <label for="paused">paused</label><br>
+                </td>
+            </tr>
+        </table>
         <canvas id="glCanvas" width="640" height="480"></canvas>
     </div>
-    <script src="./index.ts"></script>
 </body>
 
 </html>
