@@ -1,3 +1,4 @@
+import { getFPS } from './fps';
 import { createProgramFromScripts } from './shaders'
 
 export var gl: WebGLRenderingContext
@@ -17,6 +18,10 @@ window.onload = () => {
 }
 
 function step() {
+    const fps = document.querySelector("#fps") as HTMLSpanElement;
+    fps.textContent = getFPS()
+    const canvas = document.querySelector("#glCanvas") as HTMLCanvasElement;
+    resizeCanvasToDisplaySize(canvas)
     gl.clearColor(0.0, new Date().getMilliseconds() / 1000, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.POINTS, 0, 1)
@@ -29,4 +34,24 @@ function onKeyDown(e: KeyboardEvent) {
     if (!paused) window.requestAnimationFrame(step);
     const checkbox = document.querySelector("#paused") as HTMLInputElement
     checkbox.checked = paused
+}
+
+function resizeCanvasToDisplaySize(canvas: HTMLCanvasElement) {
+    const dpr = window.devicePixelRatio;
+    const { width, height } = canvas.getBoundingClientRect();
+    const displayWidth = Math.round(width * dpr);
+    const displayHeight = Math.round(height * dpr);
+
+    // Check if the canvas is not the same size.
+    const needResize = canvas.width != displayWidth ||
+        canvas.height != displayHeight;
+
+    if (needResize) {
+        // Make the canvas the same size
+        canvas.width = displayWidth;
+        canvas.height = displayHeight;
+        gl.viewport(0, 0, displayWidth, displayHeight)
+    }
+
+    return needResize;
 }
