@@ -117,182 +117,74 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"fps.ts":[function(require,module,exports) {
-"use strict";
+})({"../node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
+var bundleURL = null;
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-var lastTime = new Date();
-var lastFps;
-var frames = 0;
-
-function getFPS() {
-  frames++;
-  var thisTime = new Date();
-  var msec = thisTime.getTime() - lastTime.getTime();
-
-  if (msec >= 1000) {
-    lastFps = Math.round(frames * 1000 / msec) + ' fps';
-    lastTime = thisTime;
-    frames = 0;
+function getBundleURLCached() {
+  if (!bundleURL) {
+    bundleURL = getBundleURL();
   }
 
-  return lastFps;
+  return bundleURL;
 }
 
-exports.getFPS = getFPS;
-},{}],"shaders.ts":[function(require,module,exports) {
-"use strict";
+function getBundleURL() {
+  // Attempt to find the URL of the current script and use that as the base URL
+  try {
+    throw new Error();
+  } catch (err) {
+    var matches = ('' + err.stack).match(/(https?|file|ftp|chrome-extension|moz-extension):\/\/[^)\n]+/g);
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var index_1 = require("./index");
-
-function compileShader(shaderSource, shaderType) {
-  // Create the shader object
-  var shader = index_1.gl.createShader(shaderType); // Set the shader source code.
-
-  index_1.gl.shaderSource(shader, shaderSource); // Compile the shader
-
-  index_1.gl.compileShader(shader); // Check if it compiled
-
-  var success = index_1.gl.getShaderParameter(shader, index_1.gl.COMPILE_STATUS);
-
-  if (!success) {
-    // Something went wrong during compilation; get the error
-    throw "could not compile shader:" + index_1.gl.getShaderInfoLog(shader);
-  }
-
-  return shader;
-}
-
-function createProgram(vertexShader, fragmentShader) {
-  // create a program.
-  var program = index_1.gl.createProgram(); // attach the shaders.
-
-  index_1.gl.attachShader(program, vertexShader);
-  index_1.gl.attachShader(program, fragmentShader); // link the program.
-
-  index_1.gl.linkProgram(program); // Check if it linked.
-
-  var success = index_1.gl.getProgramParameter(program, index_1.gl.LINK_STATUS);
-
-  if (!success) {
-    // something went wrong with the link
-    throw "program failed to link:" + index_1.gl.getProgramInfoLog(program);
-  }
-
-  return program;
-}
-
-;
-
-function createShaderFromScript(scriptId, opt_shaderType) {
-  // look up the script tag by id.
-  var shaderScript = document.getElementById(scriptId);
-
-  if (!shaderScript) {
-    throw "*** Error: unknown script element" + scriptId;
-  } // extract the contents of the script tag.
-
-
-  var shaderSource = shaderScript.text; // If we didn't pass in a type, use the 'type' from
-  // the script tag.
-
-  if (!opt_shaderType) {
-    if (shaderScript.type == "x-shader/x-vertex") {
-      opt_shaderType = index_1.gl.VERTEX_SHADER;
-    } else if (shaderScript.type == "x-shader/x-fragment") {
-      opt_shaderType = index_1.gl.FRAGMENT_SHADER;
-    } else if (!opt_shaderType) {
-      throw "*** Error: shader type not set";
+    if (matches) {
+      return getBaseURL(matches[0]);
     }
   }
 
-  return compileShader(shaderSource, opt_shaderType);
+  return '/';
 }
 
-;
-
-function createProgramFromScripts(shaderScriptIds) {
-  var vertexShader = createShaderFromScript(shaderScriptIds[0], index_1.gl.VERTEX_SHADER);
-  var fragmentShader = createShaderFromScript(shaderScriptIds[1], index_1.gl.FRAGMENT_SHADER);
-  return createProgram(vertexShader, fragmentShader);
+function getBaseURL(url) {
+  return ('' + url).replace(/^((?:https?|file|ftp|chrome-extension|moz-extension):\/\/.+)?\/[^/]+(?:\?.*)?$/, '$1') + '/';
 }
 
-exports.createProgramFromScripts = createProgramFromScripts;
-},{"./index":"index.ts"}],"index.ts":[function(require,module,exports) {
-"use strict";
+exports.getBundleURL = getBundleURLCached;
+exports.getBaseURL = getBaseURL;
+},{}],"../node_modules/parcel-bundler/src/builtins/css-loader.js":[function(require,module,exports) {
+var bundle = require('./bundle-url');
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
+function updateLink(link) {
+  var newLink = link.cloneNode();
 
-var fps_1 = require("./fps");
+  newLink.onload = function () {
+    link.remove();
+  };
 
-var shaders_1 = require("./shaders");
+  newLink.href = link.href.split('?')[0] + '?' + Date.now();
+  link.parentNode.insertBefore(newLink, link.nextSibling);
+}
 
-var paused = false;
+var cssTimeout = null;
 
-window.onload = function () {
-  document.addEventListener('keydown', onKeyDown);
-  var canvas = document.querySelector("#glCanvas");
-  exports.gl = canvas.getContext("webgl");
-
-  if (exports.gl === null) {
-    alert("Unable to initialize WebGL. Your browser or machine may not support it.");
+function reloadCSS() {
+  if (cssTimeout) {
     return;
   }
 
-  var prog = shaders_1.createProgramFromScripts(['my_vertex_shader', 'my_fragment_shader']);
-  exports.gl.useProgram(prog);
-  window.requestAnimationFrame(step);
-};
+  cssTimeout = setTimeout(function () {
+    var links = document.querySelectorAll('link[rel="stylesheet"]');
 
-function step() {
-  var fps = document.querySelector("#fps");
-  fps.textContent = fps_1.getFPS();
-  var canvas = document.querySelector("#glCanvas");
-  resizeCanvasToDisplaySize(canvas);
-  exports.gl.clearColor(0.0, new Date().getMilliseconds() / 1000, 0.0, 1.0);
-  exports.gl.clear(exports.gl.COLOR_BUFFER_BIT);
-  exports.gl.drawArrays(exports.gl.POINTS, 0, 1);
-  if (paused) return;
-  window.requestAnimationFrame(step);
+    for (var i = 0; i < links.length; i++) {
+      if (bundle.getBaseURL(links[i].href) === bundle.getBundleURL()) {
+        updateLink(links[i]);
+      }
+    }
+
+    cssTimeout = null;
+  }, 50);
 }
 
-function onKeyDown(e) {
-  if (e.key === ' ') paused = !paused;
-  if (!paused) window.requestAnimationFrame(step);
-  var checkbox = document.querySelector("#paused");
-  checkbox.checked = paused;
-}
-
-function resizeCanvasToDisplaySize(canvas) {
-  var dpr = window.devicePixelRatio;
-
-  var _a = canvas.getBoundingClientRect(),
-      width = _a.width,
-      height = _a.height;
-
-  var displayWidth = Math.round(width * dpr);
-  var displayHeight = Math.round(height * dpr); // Check if the canvas is not the same size.
-
-  var needResize = canvas.width != displayWidth || canvas.height != displayHeight;
-
-  if (needResize) {
-    // Make the canvas the same size
-    canvas.width = displayWidth;
-    canvas.height = displayHeight;
-    exports.gl.viewport(0, 0, displayWidth, displayHeight);
-  }
-
-  return needResize;
-}
-},{"./fps":"fps.ts","./shaders":"shaders.ts"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+module.exports = reloadCSS;
+},{"./bundle-url":"../node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -496,5 +388,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["../node_modules/parcel-bundler/src/builtins/hmr-runtime.js","index.ts"], null)
-//# sourceMappingURL=/src.77de5100.js.map
+},{}]},{},["../node_modules/parcel-bundler/src/builtins/hmr-runtime.js"], null)
+//# sourceMappingURL=/index.js.map

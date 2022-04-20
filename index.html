@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>WebGL</title></head><body> <div id="container"> <table> <tr> <td> <h1> webgl canvas </h1> </td> <td> <input type="checkbox" id="paused"> <label for="paused">paused</label><br> </td> </tr> </table> <canvas id="glCanvas" width="640" height="480"></canvas> </div> <script src="src.50a8b148.js"></script> <script id="my_vertex_shader" type="x-shader/x-vertex">
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>WebGL</title></head><body style="overflow:hidden;margin:0"> <table style="position:absolute;bottom:3vh;left:50%;transform:translate(-50%);background-color:#fff;padding:1vh;"> <tr> <td> <label for="paused">press SPACE to pause</label> <input type="checkbox" id="paused" disabled> </td> <td> <span id="fps"></span> </td> </tr> </table> <canvas id="glCanvas" style="width:100vw;height:100vh"></canvas> <script src="src.c7ec3107.js"></script> <script id="my_vertex_shader" type="x-shader/x-vertex">
         void main(void) {
             gl_Position = vec4(0, 0, 0, 1.0);
             gl_PointSize = 10.0;
