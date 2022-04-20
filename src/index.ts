@@ -4,12 +4,9 @@ export var gl: WebGLRenderingContext
 var paused = false
 
 window.onload = () => {
-    document.getElementById('paused')!.addEventListener('click', checkPaused)
+    document.addEventListener('keydown', onKeyDown);
     const canvas = document.querySelector("#glCanvas") as HTMLCanvasElement;
-    // Initialize the GL context
     gl = canvas!.getContext("webgl")!;
-
-    // Only continue if WebGL is available and working
     if (gl === null) {
         alert("Unable to initialize WebGL. Your browser or machine may not support it.");
         return;
@@ -27,9 +24,9 @@ function step() {
     window.requestAnimationFrame(step);
 }
 
-function checkPaused() {
-    var checkbox = document.getElementById('paused') as HTMLInputElement
-    paused = checkbox.checked
-    if (paused) return
-    window.requestAnimationFrame(step);
+function onKeyDown(e: KeyboardEvent) {
+    if (e.key === ' ') paused = !paused
+    if (!paused) window.requestAnimationFrame(step);
+    const checkbox = document.querySelector("#paused") as HTMLInputElement
+    checkbox.checked = paused
 }
