@@ -235,7 +235,9 @@ var fps_1 = require("./fps");
 
 var shaders_1 = require("./shaders");
 
-var paused = false;
+var paused = true;
+var size = 1;
+var uniforms = {};
 
 window.onload = function () {
   document.addEventListener('keydown', onKeyDown);
@@ -249,26 +251,51 @@ window.onload = function () {
 
   var prog = shaders_1.createProgramFromScripts(['my_vertex_shader', 'my_fragment_shader']);
   exports.gl.useProgram(prog);
+  uniforms.position = exports.gl.getUniformLocation(prog, 'position');
   window.requestAnimationFrame(step);
 };
 
 function step() {
   var fps = document.querySelector("#fps");
   fps.textContent = fps_1.getFPS();
+  var sizeSpan = document.querySelector("#size");
+  sizeSpan.textContent = 'Size: ' + size;
   var canvas = document.querySelector("#glCanvas");
   resizeCanvasToDisplaySize(canvas);
-  exports.gl.clearColor(0.0, new Date().getMilliseconds() / 1000, 0.0, 1.0);
+  exports.gl.clearColor(0.0, 0 * new Date().getMilliseconds() / 1000, 0.0, 1.0);
   exports.gl.clear(exports.gl.COLOR_BUFFER_BIT);
-  exports.gl.drawArrays(exports.gl.POINTS, 0, 1);
+
+  for (var i = 0; i < size; i++) {
+    exports.gl.uniform2f(uniforms.position, Math.random(), Math.random());
+    exports.gl.drawArrays(exports.gl.POINTS, 0, 1);
+  }
+
   if (paused) return;
   window.requestAnimationFrame(step);
 }
 
 function onKeyDown(e) {
-  if (e.key === ' ') paused = !paused;
-  if (!paused) window.requestAnimationFrame(step);
-  var checkbox = document.querySelector("#paused");
-  checkbox.checked = paused;
+  switch (e.key) {
+    case ' ':
+      paused = !paused;
+      var checkbox = document.querySelector("#paused");
+      checkbox.checked = paused;
+      if (!paused) window.requestAnimationFrame(step);
+      return;
+
+    case 'ArrowUp':
+      size *= 2;
+      break;
+
+    case 'ArrowDown':
+      if (size > 1) size /= 2;
+      break;
+
+    default: //console.log(e)
+
+  }
+
+  if (paused) window.requestAnimationFrame(step);
 }
 
 function resizeCanvasToDisplaySize(canvas) {
@@ -320,7 +347,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55138" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51861" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
