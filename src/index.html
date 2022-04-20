@@ -7,7 +7,6 @@
 </head>
 
 <body>
-    <script src="./index.ts"></script>
     <div id="container">
         <table>
             <tr>
@@ -24,6 +23,22 @@
         </table>
         <canvas id="glCanvas" width="640" height="480"></canvas>
     </div>
+
+    <script src="./index.ts"></script>
+
+    <script id="my_vertex_shader" type="x-shader/x-vertex">
+        void main(void) {
+            gl_Position = vec4(0, 0, 0, 1.0);
+            gl_PointSize = 10.0;
+        }
+    </script>
+
+    <script id="my_fragment_shader" type="x-shader/x-fragment">
+        void main(void) {
+            gl_FragColor = vec4(1, 1, 0, 1.0);
+        }
+    </script>
+
 </body>
 
 </html>
