@@ -7,26 +7,32 @@
 </head>
 
 <body style="overflow: hidden; margin: 0">
-    <table style="position: absolute; bottom: 3vh; left: 50%; transform: translate(-50%, 0); background-color: white; padding: 1vh; ">
-        <tr>
-            <td>
-                <label for="paused">press SPACE to pause</label>
-                <input type="checkbox" id="paused" disabled />
-            </td>
-            <td>
-                <span id="fps"></span>
-            </td>
-        </tr>
-    </table>
-    
+    <div style="position: absolute; bottom: 3vh; left: 50%; transform: translate(-50%, 0); background-color: white; padding: 1vh; ">
+        <table style="border-spacing: 1vh">
+            <tr>
+                <td>
+                    <label for="paused">press SPACE to pause</label>
+                    <input type="checkbox" id="paused" disabled />
+                </td>
+                <td>
+                    <span id="fps"></span>
+                </td>
+                <td>
+                    <span id="size"></span>
+                </td>
+            </tr>
+        </table>
+    </div>
+
     <canvas id="glCanvas" style="width:100vw;height:100vh"></canvas>
 
     <script src="./index.ts"></script>
 
     <script id="my_vertex_shader" type="x-shader/x-vertex">
+        uniform vec2 position;
         void main(void) {
-            gl_Position = vec4(0, 0, 0, 1.0);
-            gl_PointSize = 10.0;
+            gl_Position = vec4(position*vec2(2)-vec2(1), 0, 1.0);
+            gl_PointSize = 1.0;
         }
     </script>
 
