@@ -1,24 +1,24 @@
 import { getFPS } from './fps';
 import { createProgramFromScripts } from './shaders'
 
-export var gl: WebGLRenderingContext
+export var gl: WebGL2RenderingContext
 var paused = true
-var size = 1
+var size = 2
 const uniforms: {
-    position?: WebGLUniformLocation | null
+    slices?: WebGLUniformLocation
 } = {}
 
 window.onload = () => {
     document.addEventListener('keydown', onKeyDown)
     const canvas = document.querySelector("#glCanvas") as HTMLCanvasElement
-    gl = canvas!.getContext("webgl")!
+    gl = canvas!.getContext("webgl2")!
     if (gl === null) {
         alert("Unable to initialize WebGL. Your browser or machine may not support it.")
         return
     }
     const prog = createProgramFromScripts(['my_vertex_shader', 'my_fragment_shader'])
     gl.useProgram(prog)
-    uniforms.position = gl.getUniformLocation(prog, 'position')
+    uniforms.slices = gl.getUniformLocation(prog, 'slices')!
     window.requestAnimationFrame(step);
 }
 
@@ -29,12 +29,14 @@ function step() {
     sizeSpan.textContent = 'Size: ' + size
     const canvas = document.querySelector("#glCanvas") as HTMLCanvasElement;
     resizeCanvasToDisplaySize(canvas)
-    gl.clearColor(0.0, 0*new Date().getMilliseconds() / 1000, 0.0, 1.0)
+    gl.clearColor(0.0, 0.3+0*new Date().getMilliseconds() / 1000, 0.0, 1.0)
     gl.clear(gl.COLOR_BUFFER_BIT)
-    for (var i = 0; i < size; i++) {
-        gl.uniform2f(uniforms.position!, Math.random(), Math.random())
-        gl.drawArrays(gl.POINTS, 0, 1)
-    }
+    gl.enable(gl.BLEND)
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+    //for (var i = 0; i < size; i++) {
+        gl.uniform1f(uniforms.slices!, size)
+        gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, size)
+    //}
     if (paused) return
     window.requestAnimationFrame(step);
 }
@@ -48,10 +50,12 @@ function onKeyDown(e: KeyboardEvent) {
             if (!paused) window.requestAnimationFrame(step)
             return
         case 'ArrowUp':
-            size *= 2
+            //size *= 2
+            size++
             break
         case 'ArrowDown':
-            if (size>1) size /= 2
+            //if (size>1) size /= 2
+            if (size>1) size--
             break
         default:
             //console.log(e)

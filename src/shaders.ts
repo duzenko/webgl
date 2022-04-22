@@ -49,7 +49,8 @@ function createShaderFromScript(scriptId: string, opt_shaderType: GLuint) {
     }
 
     // extract the contents of the script tag.
-    var shaderSource = shaderScript.text;
+    var shaderSource = shaderScript.text
+    shaderSource = '#version 300 es\n' + shaderSource
 
     // If we didn't pass in a type, use the 'type' from
     // the script tag.
