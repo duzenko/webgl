@@ -1,4 +1,5 @@
-import { gl } from "./index";
+import { gl } from "./index"
+//import x from "url:./shader.vert"
 
 function compileShader(shaderSource: string, shaderType: GLuint) {
     // Create the shader object
@@ -41,34 +42,16 @@ function createProgram(vertexShader: WebGLShader, fragmentShader: WebGLShader) {
     return program;
 };
 
-function createShaderFromScript(scriptId: string, opt_shaderType: GLuint) {
-    // look up the script tag by id.
-    var shaderScript = document.getElementById(scriptId) as HTMLScriptElement
-    if (!shaderScript) {
-        throw ("*** Error: unknown script element" + scriptId);
-    }
-
-    // extract the contents of the script tag.
-    var shaderSource = shaderScript.text
+async function createShaderFromScript(scriptId: string, opt_shaderType: GLuint) {
+    var x = await fetch(scriptId)
+    var shaderSource = await x.text()
+    console.log(shaderSource.length, shaderSource)
     shaderSource = '#version 300 es\n' + shaderSource
-
-    // If we didn't pass in a type, use the 'type' from
-    // the script tag.
-    if (!opt_shaderType) {
-        if (shaderScript.type == "x-shader/x-vertex") {
-            opt_shaderType = gl.VERTEX_SHADER;
-        } else if (shaderScript.type == "x-shader/x-fragment") {
-            opt_shaderType = gl.FRAGMENT_SHADER;
-        } else if (!opt_shaderType) {
-            throw ("*** Error: shader type not set");
-        }
-    }
-
     return compileShader(shaderSource, opt_shaderType);
 };
 
-export function createProgramFromScripts(shaderScriptIds: string[]) {
-    var vertexShader = createShaderFromScript(shaderScriptIds[0], gl.VERTEX_SHADER);
-    var fragmentShader = createShaderFromScript(shaderScriptIds[1], gl.FRAGMENT_SHADER);
+export async function createProgramFromScripts(shaderScriptId: string) {
+    var vertexShader = await createShaderFromScript(shaderScriptId+'.vert', gl.VERTEX_SHADER);
+    var fragmentShader = await createShaderFromScript(shaderScriptId+'.frag', gl.FRAGMENT_SHADER);
     return createProgram(vertexShader, fragmentShader);
 }

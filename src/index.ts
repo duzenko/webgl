@@ -8,7 +8,7 @@ const uniforms: {
     slices?: WebGLUniformLocation
 } = {}
 
-window.onload = () => {
+window.onload = async () => {
     document.addEventListener('keydown', onKeyDown)
     const canvas = document.querySelector("#glCanvas") as HTMLCanvasElement
     gl = canvas!.getContext("webgl2")!
@@ -16,7 +16,7 @@ window.onload = () => {
         alert("Unable to initialize WebGL. Your browser or machine may not support it.")
         return
     }
-    const prog = createProgramFromScripts(['my_vertex_shader', 'my_fragment_shader'])
+    const prog = await createProgramFromScripts('shader')
     gl.useProgram(prog)
     uniforms.slices = gl.getUniformLocation(prog, 'slices')!
     window.requestAnimationFrame(step);
