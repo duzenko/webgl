@@ -7,12 +7,14 @@ var paused = true
 var wireframe = false
 var size = 32
 var rotation = 0
+var aspectRatio = 1
 var torusDetail = 16
 
 const uniforms: {
     slices?: WebGLUniformLocation
     torusDetail?: WebGLUniformLocation
     rotation?: WebGLUniformLocation
+    aspectRatio?: WebGLUniformLocation
 } = {}
 
 window.onload = async () => {
@@ -28,6 +30,7 @@ window.onload = async () => {
     uniforms.slices = gl.getUniformLocation(prog, 'slices')!
     uniforms.torusDetail = gl.getUniformLocation(prog, 'torusDetail')!
     uniforms.rotation = gl.getUniformLocation(prog, 'rotation')!
+    uniforms.aspectRatio = gl.getUniformLocation(prog, 'aspectRatio')!
     var image = new Image();
     image.crossOrigin = 'anonymous'
     image.src = "https://upload.wikimedia.org/wikipedia/commons/9/9a/512x512_Dissolve_Noise_Texture.png"
@@ -59,7 +62,8 @@ function step() {
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
     gl.uniform1f(uniforms.slices!, size)
     gl.uniform1i(uniforms.torusDetail!, torusDetail)
-    gl.uniform1f(uniforms.rotation!, rotation*1e-2)
+    gl.uniform1f(uniforms.rotation!, rotation * 1e-2)
+    gl.uniform1f(uniforms.aspectRatio!, canvas.width / canvas.height)
     gl.drawArraysInstanced(wireframe ? gl.LINE_STRIP : gl.TRIANGLE_STRIP, 0, torusDetail * torusDetail * 6, size + 1)
     if (paused) return
     window.requestAnimationFrame(step);

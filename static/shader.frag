@@ -24,18 +24,8 @@ void main(void) {
     float hairLength = texture(u_texture, texCoord).r;
     outColor = vec4(1.0);
     if(height==0.0) {
-        //outColor.g = -position.z*33.-6.1;
-        //outColor.r = 0.;
         return;
     }
-    //outColor = vec4(1, 0, 1, formula(texCoord.xy*1e2));
-    //outColor.rgb = vec3(1.0);
-    //outColor.a = (outColor.r - (height-0.5/slices))/slices;
-    //outColor.a = step(0.96, outColor.r);
     outColor.a = step(height, sqrt(hairLength+1e-3));
-    //outColor.rgb = vec3(height*5.-2., 0, 3.-height*5.);
-    //outColor.gb = vec2(height);
-    outColor.rgb *= height*0.7+0.3;
-    //outColor.b *= 0.5;
-    //outColor = vec4(1.0*height/slices);
+    outColor.rgb *= sqrt(height)*0.5+0.5;
 }

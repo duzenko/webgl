@@ -3,6 +3,7 @@
 uniform float slices;
 uniform int torusDetail;
 uniform float rotation;
+uniform float aspectRatio;
 
 out vec2 texCoord;
 out vec3 position;
@@ -36,7 +37,6 @@ void main(void) {
     gl_Position.z = innerRadius * sin(texCoord.x * twopi);
     //dbg = vec3(t/float(numt), 0, s / float(numc));
     texCoord.y *= 3.0; 
-    //texCoord /= 8.;
 #endif
     mat3 rotationMatrix = mat3(1);
     rotationMatrix[1].y = cos(rotation);
@@ -48,4 +48,5 @@ void main(void) {
     gl_Position.z += 2.0;
     gl_Position.zw = vec2(gl_Position.z-1.0, gl_Position.z);
     gl_Position.xy *= 2.0;
+    gl_Position.x /= aspectRatio;
 }
