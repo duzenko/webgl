@@ -302,32 +302,11 @@ function compileShader(shaderSource, shaderType) {
 
   if (!success) {
     // Something went wrong during compilation; get the error
-    throw "could not compile shader:" + index_1.gl.getShaderInfoLog(shader);
+    throw index_1.gl.getShaderInfoLog(shader);
   }
 
   return shader;
 }
-
-function createProgram(vertexShader, fragmentShader) {
-  // create a program.
-  var program = index_1.gl.createProgram(); // attach the shaders.
-
-  index_1.gl.attachShader(program, vertexShader);
-  index_1.gl.attachShader(program, fragmentShader); // link the program.
-
-  index_1.gl.linkProgram(program); // Check if it linked.
-
-  var success = index_1.gl.getProgramParameter(program, index_1.gl.LINK_STATUS);
-
-  if (!success) {
-    // something went wrong with the link
-    throw "program failed to link:" + index_1.gl.getProgramInfoLog(program);
-  }
-
-  return program;
-}
-
-;
 
 function createShaderFromScript(scriptId, opt_shaderType) {
   return __awaiter(this, void 0, void 0, function () {
@@ -347,13 +326,46 @@ function createShaderFromScript(scriptId, opt_shaderType) {
 
         case 2:
           shaderSource = _a.sent();
-          shaderSource = '#version 300 es\n' + shaderSource;
+
+          try {
+            return [2
+            /*return*/
+            , compileShader(shaderSource, opt_shaderType)];
+          } catch (e) {
+            console.error('compile error', scriptId, e);
+            return [2
+            /*return*/
+            , 0];
+          }
+
           return [2
           /*return*/
-          , compileShader(shaderSource, opt_shaderType)];
+          ];
       }
     });
   });
+}
+
+;
+
+function createProgram(vertexShader, fragmentShader) {
+  if (!vertexShader || !fragmentShader) return; // create a program.
+
+  var program = index_1.gl.createProgram(); // attach the shaders.
+
+  index_1.gl.attachShader(program, vertexShader);
+  index_1.gl.attachShader(program, fragmentShader); // link the program.
+
+  index_1.gl.linkProgram(program); // Check if it linked.
+
+  var success = index_1.gl.getProgramParameter(program, index_1.gl.LINK_STATUS);
+
+  if (!success) {
+    // something went wrong with the link
+    console.error("program failed to link:" + index_1.gl.getProgramInfoLog(program));
+  }
+
+  return program;
 }
 
 ;
@@ -538,7 +550,10 @@ var fps_1 = require("./fps");
 var shaders_1 = require("./shaders");
 
 var paused = true;
-var size = 2;
+var wireframe = false;
+var size = 32;
+var rotation = 0;
+var torusDetail = 16;
 var uniforms = {};
 
 window.onload = function () {
@@ -564,8 +579,14 @@ window.onload = function () {
 
         case 1:
           prog = _a.sent();
+          if (!prog) return [2
+          /*return*/
+          ];
           exports.gl.useProgram(prog);
           uniforms.slices = exports.gl.getUniformLocation(prog, 'slices');
+          uniforms.torusDetail = exports.gl.getUniformLocation(prog, 'torusDetail');
+          uniforms.rotation = exports.gl.getUniformLocation(prog, 'rotation');
+          uniforms.aspectRatio = exports.gl.getUniformLocation(prog, 'aspectRatio');
           image = new Image();
           image.crossOrigin = 'anonymous';
           image.src = "https://upload.wikimedia.org/wikipedia/commons/9/9a/512x512_Dissolve_Noise_Texture.png";
@@ -573,6 +594,8 @@ window.onload = function () {
             var texture = exports.gl.createTexture();
             exports.gl.bindTexture(exports.gl.TEXTURE_2D, texture);
             exports.gl.texImage2D(exports.gl.TEXTURE_2D, 0, exports.gl.RGBA, exports.gl.RGBA, exports.gl.UNSIGNED_BYTE, image);
+            exports.gl.texParameteri(exports.gl.TEXTURE_2D, exports.gl.TEXTURE_MIN_FILTER, exports.gl.NEAREST_MIPMAP_LINEAR);
+            exports.gl.texParameteri(exports.gl.TEXTURE_2D, exports.gl.TEXTURE_MAG_FILTER, exports.gl.NEAREST);
             exports.gl.generateMipmap(exports.gl.TEXTURE_2D);
             window.requestAnimationFrame(step);
           });
@@ -589,16 +612,21 @@ function step() {
   fps.textContent = fps_1.getFPS();
   var sizeSpan = document.querySelector("#size");
   sizeSpan.textContent = 'Size: ' + size;
+  var checkbox = document.querySelector("#paused");
+  checkbox.checked = paused;
   var canvas = document.querySelector("#glCanvas");
   resizeCanvasToDisplaySize(canvas);
   exports.gl.clearColor(0.0, 0.3 + 0 * new Date().getMilliseconds() / 1000, 0.0, 1.0);
-  exports.gl.clear(exports.gl.COLOR_BUFFER_BIT);
+  exports.gl.clear(exports.gl.COLOR_BUFFER_BIT | exports.gl.DEPTH_BUFFER_BIT);
+  exports.gl.enable(exports.gl.CULL_FACE);
+  exports.gl.enable(exports.gl.DEPTH_TEST);
   exports.gl.enable(exports.gl.BLEND);
-  exports.gl.blendFunc(exports.gl.SRC_ALPHA, exports.gl.ONE_MINUS_SRC_ALPHA); //for (var i = 0; i < size; i++) {
-
+  exports.gl.blendFunc(exports.gl.SRC_ALPHA, exports.gl.ONE_MINUS_SRC_ALPHA);
   exports.gl.uniform1f(uniforms.slices, size);
-  exports.gl.drawArraysInstanced(exports.gl.TRIANGLE_STRIP, 0, 4, size); //}
-
+  exports.gl.uniform1i(uniforms.torusDetail, torusDetail);
+  exports.gl.uniform1f(uniforms.rotation, rotation * 1e-2);
+  exports.gl.uniform1f(uniforms.aspectRatio, canvas.width / canvas.height);
+  exports.gl.drawArraysInstanced(wireframe ? exports.gl.LINE_STRIP : exports.gl.TRIANGLE_STRIP, 0, torusDetail * torusDetail * 6, size + 1);
   if (paused) return;
   window.requestAnimationFrame(step);
 }
@@ -607,9 +635,11 @@ function onKeyDown(e) {
   switch (e.key) {
     case ' ':
       paused = !paused;
-      var checkbox = document.querySelector("#paused");
-      checkbox.checked = paused;
       if (!paused) window.requestAnimationFrame(step);
+      break;
+
+    case 'w':
+      wireframe = !wireframe;
       break;
 
     case 'ArrowUp':
@@ -619,7 +649,15 @@ function onKeyDown(e) {
 
     case 'ArrowDown':
       //if (size>1) size /= 2
-      if (size > 1) size--;
+      if (size > 0) size--;
+      break;
+
+    case 'ArrowLeft':
+      rotation++;
+      break;
+
+    case 'ArrowRight':
+      rotation--;
       break;
 
     default: //console.log(e)
@@ -678,7 +716,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53964" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58115" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

@@ -1,11 +1,17 @@
+#version 300 es
+
 precision highp float;
 
 in vec2 texCoord;
 in float height;
+in vec3 position;
+in vec3 dbg;
+in vec3 normal;
 
 out vec4 outColor;
 
 uniform sampler2D u_texture;
+uniform float slices;
 
 float formula(vec2 tc) {
     tc = fract(tc);
@@ -16,11 +22,13 @@ float formula(vec2 tc) {
 }
 
 void main(void) {
+    float hairLength = texture(u_texture, texCoord).r;
+    outColor = vec4(1.0);
+    float lit = dot(normalize(normal), normalize(vec3(0.5, -1, -0.5)));
+    outColor.rgb *= mix( max(0.0, lit), 1.0, 0.5);
     if(height==0.0) {
-        outColor = vec4(0, 0, 0, 1.0);
         return;
     }
-    outColor = vec4(1, 0, 1, formula(texCoord.xy*1e2));
-    outColor = texture(u_texture, texCoord);
-    outColor.a = 0.1*(outColor.r - 0.5);
+    outColor.a = step(height, sqrt(hairLength+1e-3));
+    outColor.rgb *= sqrt(height)*0.5+0.5;
 }
