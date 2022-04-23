@@ -32,6 +32,8 @@ async function createShaderFromScript(scriptId: string, opt_shaderType: GLuint) 
 };
 
 function createProgram(vertexShader: WebGLShader, fragmentShader: WebGLShader) {
+    if (!vertexShader || !fragmentShader) return
+
     // create a program.
     var program = gl.createProgram()!;
 

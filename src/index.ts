@@ -7,7 +7,6 @@ var paused = true
 var wireframe = false
 var size = 32
 var rotation = 0
-var aspectRatio = 1
 var torusDetail = 16
 
 const uniforms: {
@@ -26,6 +25,7 @@ window.onload = async () => {
         return
     }
     const prog = await createProgramFromScripts('shader')
+    if (!prog) return
     gl.useProgram(prog)
     uniforms.slices = gl.getUniformLocation(prog, 'slices')!
     uniforms.torusDetail = gl.getUniformLocation(prog, 'torusDetail')!

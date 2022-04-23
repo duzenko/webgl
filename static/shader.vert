@@ -7,6 +7,7 @@ uniform float aspectRatio;
 
 out vec2 texCoord;
 out vec3 position;
+out vec3 normal;
 out vec3 dbg;
 out float height;
 
@@ -36,14 +37,21 @@ void main(void) {
     gl_Position.y = xyBase*sin(texCoord.y*twopi);
     gl_Position.z = innerRadius * sin(texCoord.x * twopi);
     //dbg = vec3(t/float(numt), 0, s / float(numc));
+
+    normal.x = cos(texCoord.y*twopi)*cos(texCoord.x*twopi);
+    normal.y = -sin(texCoord.y*twopi)*cos(texCoord.x*twopi);
+    normal.z = sin(texCoord.x*twopi);
+
     texCoord.y *= 3.0; 
+
 #endif
     mat3 rotationMatrix = mat3(1);
     rotationMatrix[1].y = cos(rotation);
     rotationMatrix[1].z = -sin(rotation);
     rotationMatrix[2].y = sin(rotation);
     rotationMatrix[2].z = cos(rotation);
-    gl_Position.xyz *= rotationMatrix;
+    gl_Position.xyz = gl_Position.xyz*rotationMatrix;
+    normal = rotationMatrix*normal;
     position = gl_Position.xyz;
     gl_Position.z += 2.0;
     gl_Position.zw = vec2(gl_Position.z-1.0, gl_Position.z);

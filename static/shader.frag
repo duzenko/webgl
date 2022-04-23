@@ -6,6 +6,7 @@ in vec2 texCoord;
 in float height;
 in vec3 position;
 in vec3 dbg;
+in vec3 normal;
 
 out vec4 outColor;
 
@@ -23,6 +24,8 @@ float formula(vec2 tc) {
 void main(void) {
     float hairLength = texture(u_texture, texCoord).r;
     outColor = vec4(1.0);
+    float lit = dot(normalize(normal), normalize(vec3(0.5, -1, -0.5)));
+    outColor.rgb *= mix( max(0.0, lit), 1.0, 0.5);
     if(height==0.0) {
         return;
     }
