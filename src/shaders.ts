@@ -1,5 +1,4 @@
 import { gl } from "./index"
-//import x from "url:./shader.vert"
 
 function compileShader(shaderSource: string, shaderType: GLuint) {
     // Create the shader object
@@ -45,7 +44,6 @@ function createProgram(vertexShader: WebGLShader, fragmentShader: WebGLShader) {
 async function createShaderFromScript(scriptId: string, opt_shaderType: GLuint) {
     var x = await fetch(scriptId)
     var shaderSource = await x.text()
-    console.log(shaderSource.length, shaderSource)
     shaderSource = '#version 300 es\n' + shaderSource
     return compileShader(shaderSource, opt_shaderType);
 };

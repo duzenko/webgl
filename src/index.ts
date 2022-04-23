@@ -19,7 +19,16 @@ window.onload = async () => {
     const prog = await createProgramFromScripts('shader')
     gl.useProgram(prog)
     uniforms.slices = gl.getUniformLocation(prog, 'slices')!
-    window.requestAnimationFrame(step);
+    var image = new Image();
+    image.crossOrigin = 'anonymous'
+    image.src = "https://upload.wikimedia.org/wikipedia/commons/9/9a/512x512_Dissolve_Noise_Texture.png"
+    image.addEventListener('load', function () {
+        const texture = gl.createTexture()
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+        gl.generateMipmap(gl.TEXTURE_2D);
+        window.requestAnimationFrame(step);
+    });
 }
 
 function step() {
@@ -48,7 +57,7 @@ function onKeyDown(e: KeyboardEvent) {
             const checkbox = document.querySelector("#paused") as HTMLInputElement
             checkbox.checked = paused
             if (!paused) window.requestAnimationFrame(step)
-            return
+            break
         case 'ArrowUp':
             //size *= 2
             size++
