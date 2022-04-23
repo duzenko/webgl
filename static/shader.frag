@@ -1,3 +1,5 @@
+#version 300 es
+
 precision highp float;
 
 in vec2 texCoord;
@@ -20,12 +22,15 @@ float formula(vec2 tc) {
 
 void main(void) {
     if(height==0.0) {
-        outColor = vec4(0.5*abs(cos(position*3e1)), 1.0);
-        //outColor = vec4(dbg, 1.0);
+        //outColor = vec4(0.5*abs(cos(position*3e1)), 1.0);
+        outColor = vec4(dbg, 1.0);
         return;
     }
     outColor = vec4(1, 0, 1, formula(texCoord.xy*1e2));
     outColor = texture(u_texture, texCoord);
-    outColor.a = (outColor.r - height)/slices;
-    outColor.rgb = vec3(1);
+    //outColor.rgb = vec3(1.0);
+    outColor.a = (outColor.r - (height-0.5/slices))/slices;
+    //outColor.rg = texCoord;
+    //outColor.rgb = vec3(1.0);
+    //outColor = vec4(1.0*height/slices);
 }

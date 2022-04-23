@@ -14,11 +14,22 @@ function compileShader(shaderSource: string, shaderType: GLuint) {
     var success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
     if (!success) {
         // Something went wrong during compilation; get the error
-        throw "could not compile shader:" + gl.getShaderInfoLog(shader);
+        throw gl.getShaderInfoLog(shader);
     }
 
     return shader;
 }
+
+async function createShaderFromScript(scriptId: string, opt_shaderType: GLuint) {
+    var x = await fetch(scriptId)
+    var shaderSource = await x.text()
+    try {
+        return compileShader(shaderSource, opt_shaderType)
+    } catch (e) {
+        console.log('compile error', scriptId)
+        throw e
+    }
+};
 
 function createProgram(vertexShader: WebGLShader, fragmentShader: WebGLShader) {
     // create a program.
@@ -39,13 +50,6 @@ function createProgram(vertexShader: WebGLShader, fragmentShader: WebGLShader) {
     }
 
     return program;
-};
-
-async function createShaderFromScript(scriptId: string, opt_shaderType: GLuint) {
-    var x = await fetch(scriptId)
-    var shaderSource = await x.text()
-    shaderSource = '#version 300 es\n' + shaderSource
-    return compileShader(shaderSource, opt_shaderType);
 };
 
 export async function createProgramFromScripts(shaderScriptId: string) {
