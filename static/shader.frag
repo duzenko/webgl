@@ -6,6 +6,7 @@ in float height;
 out vec4 outColor;
 
 uniform sampler2D u_texture;
+uniform float slices;
 
 float formula(vec2 tc) {
     tc = fract(tc);
@@ -22,5 +23,6 @@ void main(void) {
     }
     outColor = vec4(1, 0, 1, formula(texCoord.xy*1e2));
     outColor = texture(u_texture, texCoord);
-    outColor.a = 0.1*(outColor.r - 0.5);
+    outColor.a = (outColor.r - height)/slices;
+    outColor.rgb = vec3(1);
 }

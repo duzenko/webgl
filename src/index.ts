@@ -3,7 +3,7 @@ import { createProgramFromScripts } from './shaders'
 
 export var gl: WebGL2RenderingContext
 var paused = true
-var size = 2
+var size = 26
 const uniforms: {
     slices?: WebGLUniformLocation
 } = {}
@@ -42,10 +42,8 @@ function step() {
     gl.clear(gl.COLOR_BUFFER_BIT)
     gl.enable(gl.BLEND)
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-    //for (var i = 0; i < size; i++) {
-        gl.uniform1f(uniforms.slices!, size)
-        gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, size)
-    //}
+    gl.uniform1f(uniforms.slices!, size+1)
+    gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, size+1)
     if (paused) return
     window.requestAnimationFrame(step);
 }
@@ -64,7 +62,7 @@ function onKeyDown(e: KeyboardEvent) {
             break
         case 'ArrowDown':
             //if (size>1) size /= 2
-            if (size>1) size--
+            if (size>0) size--
             break
         default:
             //console.log(e)
