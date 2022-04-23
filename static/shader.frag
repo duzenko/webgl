@@ -2,6 +2,8 @@ precision highp float;
 
 in vec2 texCoord;
 in float height;
+in vec3 position;
+in vec3 dbg;
 
 out vec4 outColor;
 
@@ -18,7 +20,8 @@ float formula(vec2 tc) {
 
 void main(void) {
     if(height==0.0) {
-        outColor = vec4(0, 0, 0, 1.0);
+        outColor = vec4(0.5*abs(cos(position*3e1)), 1.0);
+        //outColor = vec4(dbg, 1.0);
         return;
     }
     outColor = vec4(1, 0, 1, formula(texCoord.xy*1e2));

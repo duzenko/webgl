@@ -2,10 +2,15 @@ import { getFPS } from './fps';
 import { createProgramFromScripts } from './shaders'
 
 export var gl: WebGL2RenderingContext
+
 var paused = true
-var size = 26
+var wireframe = false
+var size = 0
+var torusDetail = 16
+
 const uniforms: {
     slices?: WebGLUniformLocation
+    torusDetail?: WebGLUniformLocation
 } = {}
 
 window.onload = async () => {
@@ -19,6 +24,7 @@ window.onload = async () => {
     const prog = await createProgramFromScripts('shader')
     gl.useProgram(prog)
     uniforms.slices = gl.getUniformLocation(prog, 'slices')!
+    uniforms.torusDetail = gl.getUniformLocation(prog, 'torusDetail')!
     var image = new Image();
     image.crossOrigin = 'anonymous'
     image.src = "https://upload.wikimedia.org/wikipedia/commons/9/9a/512x512_Dissolve_Noise_Texture.png"
@@ -40,10 +46,12 @@ function step() {
     resizeCanvasToDisplaySize(canvas)
     gl.clearColor(0.0, 0.3+0*new Date().getMilliseconds() / 1000, 0.0, 1.0)
     gl.clear(gl.COLOR_BUFFER_BIT)
+    gl.enable(gl.CULL_FACE);
     gl.enable(gl.BLEND)
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-    gl.uniform1f(uniforms.slices!, size+1)
-    gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, size+1)
+    gl.uniform1f(uniforms.slices!, size + 1)
+    gl.uniform1i(uniforms.torusDetail!, torusDetail)
+    gl.drawArraysInstanced(wireframe ? gl.LINE_STRIP : gl.TRIANGLE_STRIP, 0, torusDetail * torusDetail * 6, size + 1)
     if (paused) return
     window.requestAnimationFrame(step);
 }
@@ -55,6 +63,9 @@ function onKeyDown(e: KeyboardEvent) {
             const checkbox = document.querySelector("#paused") as HTMLInputElement
             checkbox.checked = paused
             if (!paused) window.requestAnimationFrame(step)
+            break
+        case 'w':
+            wireframe = !wireframe;
             break
         case 'ArrowUp':
             //size *= 2
