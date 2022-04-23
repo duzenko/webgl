@@ -26,7 +26,7 @@ async function createShaderFromScript(scriptId: string, opt_shaderType: GLuint) 
     try {
         return compileShader(shaderSource, opt_shaderType)
     } catch (e) {
-        console.error('compile error', scriptId)
+        console.error('compile error', scriptId, e)
         return 0;
     }
 };
