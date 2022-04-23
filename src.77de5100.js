@@ -145,6 +145,145 @@ exports.getFPS = getFPS;
 },{}],"shaders.ts":[function(require,module,exports) {
 "use strict";
 
+var __awaiter = this && this.__awaiter || function (thisArg, _arguments, P, generator) {
+  return new (P || (P = Promise))(function (resolve, reject) {
+    function fulfilled(value) {
+      try {
+        step(generator.next(value));
+      } catch (e) {
+        reject(e);
+      }
+    }
+
+    function rejected(value) {
+      try {
+        step(generator["throw"](value));
+      } catch (e) {
+        reject(e);
+      }
+    }
+
+    function step(result) {
+      result.done ? resolve(result.value) : new P(function (resolve) {
+        resolve(result.value);
+      }).then(fulfilled, rejected);
+    }
+
+    step((generator = generator.apply(thisArg, _arguments || [])).next());
+  });
+};
+
+var __generator = this && this.__generator || function (thisArg, body) {
+  var _ = {
+    label: 0,
+    sent: function sent() {
+      if (t[0] & 1) throw t[1];
+      return t[1];
+    },
+    trys: [],
+    ops: []
+  },
+      f,
+      y,
+      t,
+      g;
+  return g = {
+    next: verb(0),
+    "throw": verb(1),
+    "return": verb(2)
+  }, typeof Symbol === "function" && (g[Symbol.iterator] = function () {
+    return this;
+  }), g;
+
+  function verb(n) {
+    return function (v) {
+      return step([n, v]);
+    };
+  }
+
+  function step(op) {
+    if (f) throw new TypeError("Generator is already executing.");
+
+    while (_) {
+      try {
+        if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+        if (y = 0, t) op = [op[0] & 2, t.value];
+
+        switch (op[0]) {
+          case 0:
+          case 1:
+            t = op;
+            break;
+
+          case 4:
+            _.label++;
+            return {
+              value: op[1],
+              done: false
+            };
+
+          case 5:
+            _.label++;
+            y = op[1];
+            op = [0];
+            continue;
+
+          case 7:
+            op = _.ops.pop();
+
+            _.trys.pop();
+
+            continue;
+
+          default:
+            if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
+              _ = 0;
+              continue;
+            }
+
+            if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
+              _.label = op[1];
+              break;
+            }
+
+            if (op[0] === 6 && _.label < t[1]) {
+              _.label = t[1];
+              t = op;
+              break;
+            }
+
+            if (t && _.label < t[2]) {
+              _.label = t[2];
+
+              _.ops.push(op);
+
+              break;
+            }
+
+            if (t[2]) _.ops.pop();
+
+            _.trys.pop();
+
+            continue;
+        }
+
+        op = body.call(thisArg, _);
+      } catch (e) {
+        op = [6, e];
+        y = 0;
+      } finally {
+        f = t = 0;
+      }
+    }
+
+    if (op[0] & 5) throw op[1];
+    return {
+      value: op[0] ? op[1] : void 0,
+      done: true
+    };
+  }
+};
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -191,41 +330,204 @@ function createProgram(vertexShader, fragmentShader) {
 ;
 
 function createShaderFromScript(scriptId, opt_shaderType) {
-  // look up the script tag by id.
-  var shaderScript = document.getElementById(scriptId);
+  return __awaiter(this, void 0, void 0, function () {
+    var x, shaderSource;
+    return __generator(this, function (_a) {
+      switch (_a.label) {
+        case 0:
+          return [4
+          /*yield*/
+          , fetch(scriptId)];
 
-  if (!shaderScript) {
-    throw "*** Error: unknown script element" + scriptId;
-  } // extract the contents of the script tag.
+        case 1:
+          x = _a.sent();
+          return [4
+          /*yield*/
+          , x.text()];
 
-
-  var shaderSource = shaderScript.text; // If we didn't pass in a type, use the 'type' from
-  // the script tag.
-
-  if (!opt_shaderType) {
-    if (shaderScript.type == "x-shader/x-vertex") {
-      opt_shaderType = index_1.gl.VERTEX_SHADER;
-    } else if (shaderScript.type == "x-shader/x-fragment") {
-      opt_shaderType = index_1.gl.FRAGMENT_SHADER;
-    } else if (!opt_shaderType) {
-      throw "*** Error: shader type not set";
-    }
-  }
-
-  return compileShader(shaderSource, opt_shaderType);
+        case 2:
+          shaderSource = _a.sent();
+          shaderSource = '#version 300 es\n' + shaderSource;
+          return [2
+          /*return*/
+          , compileShader(shaderSource, opt_shaderType)];
+      }
+    });
+  });
 }
 
 ;
 
-function createProgramFromScripts(shaderScriptIds) {
-  var vertexShader = createShaderFromScript(shaderScriptIds[0], index_1.gl.VERTEX_SHADER);
-  var fragmentShader = createShaderFromScript(shaderScriptIds[1], index_1.gl.FRAGMENT_SHADER);
-  return createProgram(vertexShader, fragmentShader);
+function createProgramFromScripts(shaderScriptId) {
+  return __awaiter(this, void 0, void 0, function () {
+    var vertexShader, fragmentShader;
+    return __generator(this, function (_a) {
+      switch (_a.label) {
+        case 0:
+          return [4
+          /*yield*/
+          , createShaderFromScript(shaderScriptId + '.vert', index_1.gl.VERTEX_SHADER)];
+
+        case 1:
+          vertexShader = _a.sent();
+          return [4
+          /*yield*/
+          , createShaderFromScript(shaderScriptId + '.frag', index_1.gl.FRAGMENT_SHADER)];
+
+        case 2:
+          fragmentShader = _a.sent();
+          return [2
+          /*return*/
+          , createProgram(vertexShader, fragmentShader)];
+      }
+    });
+  });
 }
 
 exports.createProgramFromScripts = createProgramFromScripts;
 },{"./index":"index.ts"}],"index.ts":[function(require,module,exports) {
 "use strict";
+
+var __awaiter = this && this.__awaiter || function (thisArg, _arguments, P, generator) {
+  return new (P || (P = Promise))(function (resolve, reject) {
+    function fulfilled(value) {
+      try {
+        step(generator.next(value));
+      } catch (e) {
+        reject(e);
+      }
+    }
+
+    function rejected(value) {
+      try {
+        step(generator["throw"](value));
+      } catch (e) {
+        reject(e);
+      }
+    }
+
+    function step(result) {
+      result.done ? resolve(result.value) : new P(function (resolve) {
+        resolve(result.value);
+      }).then(fulfilled, rejected);
+    }
+
+    step((generator = generator.apply(thisArg, _arguments || [])).next());
+  });
+};
+
+var __generator = this && this.__generator || function (thisArg, body) {
+  var _ = {
+    label: 0,
+    sent: function sent() {
+      if (t[0] & 1) throw t[1];
+      return t[1];
+    },
+    trys: [],
+    ops: []
+  },
+      f,
+      y,
+      t,
+      g;
+  return g = {
+    next: verb(0),
+    "throw": verb(1),
+    "return": verb(2)
+  }, typeof Symbol === "function" && (g[Symbol.iterator] = function () {
+    return this;
+  }), g;
+
+  function verb(n) {
+    return function (v) {
+      return step([n, v]);
+    };
+  }
+
+  function step(op) {
+    if (f) throw new TypeError("Generator is already executing.");
+
+    while (_) {
+      try {
+        if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+        if (y = 0, t) op = [op[0] & 2, t.value];
+
+        switch (op[0]) {
+          case 0:
+          case 1:
+            t = op;
+            break;
+
+          case 4:
+            _.label++;
+            return {
+              value: op[1],
+              done: false
+            };
+
+          case 5:
+            _.label++;
+            y = op[1];
+            op = [0];
+            continue;
+
+          case 7:
+            op = _.ops.pop();
+
+            _.trys.pop();
+
+            continue;
+
+          default:
+            if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
+              _ = 0;
+              continue;
+            }
+
+            if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
+              _.label = op[1];
+              break;
+            }
+
+            if (op[0] === 6 && _.label < t[1]) {
+              _.label = t[1];
+              t = op;
+              break;
+            }
+
+            if (t && _.label < t[2]) {
+              _.label = t[2];
+
+              _.ops.push(op);
+
+              break;
+            }
+
+            if (t[2]) _.ops.pop();
+
+            _.trys.pop();
+
+            continue;
+        }
+
+        op = body.call(thisArg, _);
+      } catch (e) {
+        op = [6, e];
+        y = 0;
+      } finally {
+        f = t = 0;
+      }
+    }
+
+    if (op[0] & 5) throw op[1];
+    return {
+      value: op[0] ? op[1] : void 0,
+      done: true
+    };
+  }
+};
+
+var _this = this;
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -236,23 +538,50 @@ var fps_1 = require("./fps");
 var shaders_1 = require("./shaders");
 
 var paused = true;
-var size = 1;
+var size = 2;
 var uniforms = {};
 
 window.onload = function () {
-  document.addEventListener('keydown', onKeyDown);
-  var canvas = document.querySelector("#glCanvas");
-  exports.gl = canvas.getContext("webgl");
+  return __awaiter(_this, void 0, void 0, function () {
+    var canvas, prog, image;
+    return __generator(this, function (_a) {
+      switch (_a.label) {
+        case 0:
+          document.addEventListener('keydown', onKeyDown);
+          canvas = document.querySelector("#glCanvas");
+          exports.gl = canvas.getContext("webgl2");
 
-  if (exports.gl === null) {
-    alert("Unable to initialize WebGL. Your browser or machine may not support it.");
-    return;
-  }
+          if (exports.gl === null) {
+            alert("Unable to initialize WebGL. Your browser or machine may not support it.");
+            return [2
+            /*return*/
+            ];
+          }
 
-  var prog = shaders_1.createProgramFromScripts(['my_vertex_shader', 'my_fragment_shader']);
-  exports.gl.useProgram(prog);
-  uniforms.position = exports.gl.getUniformLocation(prog, 'position');
-  window.requestAnimationFrame(step);
+          return [4
+          /*yield*/
+          , shaders_1.createProgramFromScripts('shader')];
+
+        case 1:
+          prog = _a.sent();
+          exports.gl.useProgram(prog);
+          uniforms.slices = exports.gl.getUniformLocation(prog, 'slices');
+          image = new Image();
+          image.crossOrigin = 'anonymous';
+          image.src = "https://upload.wikimedia.org/wikipedia/commons/9/9a/512x512_Dissolve_Noise_Texture.png";
+          image.addEventListener('load', function () {
+            var texture = exports.gl.createTexture();
+            exports.gl.bindTexture(exports.gl.TEXTURE_2D, texture);
+            exports.gl.texImage2D(exports.gl.TEXTURE_2D, 0, exports.gl.RGBA, exports.gl.RGBA, exports.gl.UNSIGNED_BYTE, image);
+            exports.gl.generateMipmap(exports.gl.TEXTURE_2D);
+            window.requestAnimationFrame(step);
+          });
+          return [2
+          /*return*/
+          ];
+      }
+    });
+  });
 };
 
 function step() {
@@ -262,13 +591,13 @@ function step() {
   sizeSpan.textContent = 'Size: ' + size;
   var canvas = document.querySelector("#glCanvas");
   resizeCanvasToDisplaySize(canvas);
-  exports.gl.clearColor(0.0, 0 * new Date().getMilliseconds() / 1000, 0.0, 1.0);
+  exports.gl.clearColor(0.0, 0.3 + 0 * new Date().getMilliseconds() / 1000, 0.0, 1.0);
   exports.gl.clear(exports.gl.COLOR_BUFFER_BIT);
+  exports.gl.enable(exports.gl.BLEND);
+  exports.gl.blendFunc(exports.gl.SRC_ALPHA, exports.gl.ONE_MINUS_SRC_ALPHA); //for (var i = 0; i < size; i++) {
 
-  for (var i = 0; i < size; i++) {
-    exports.gl.uniform2f(uniforms.position, Math.random(), Math.random());
-    exports.gl.drawArrays(exports.gl.POINTS, 0, 1);
-  }
+  exports.gl.uniform1f(uniforms.slices, size);
+  exports.gl.drawArraysInstanced(exports.gl.TRIANGLE_STRIP, 0, 4, size); //}
 
   if (paused) return;
   window.requestAnimationFrame(step);
@@ -281,14 +610,16 @@ function onKeyDown(e) {
       var checkbox = document.querySelector("#paused");
       checkbox.checked = paused;
       if (!paused) window.requestAnimationFrame(step);
-      return;
+      break;
 
     case 'ArrowUp':
-      size *= 2;
+      //size *= 2
+      size++;
       break;
 
     case 'ArrowDown':
-      if (size > 1) size /= 2;
+      //if (size>1) size /= 2
+      if (size > 1) size--;
       break;
 
     default: //console.log(e)
@@ -347,7 +678,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51861" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53964" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
