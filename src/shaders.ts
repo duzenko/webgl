@@ -26,8 +26,8 @@ async function createShaderFromScript(scriptId: string, opt_shaderType: GLuint) 
     try {
         return compileShader(shaderSource, opt_shaderType)
     } catch (e) {
-        console.log('compile error', scriptId)
-        throw e
+        console.error('compile error', scriptId)
+        return 0;
     }
 };
 
@@ -46,7 +46,7 @@ function createProgram(vertexShader: WebGLShader, fragmentShader: WebGLShader) {
     var success = gl.getProgramParameter(program, gl.LINK_STATUS);
     if (!success) {
         // something went wrong with the link
-        throw ("program failed to link:" + gl.getProgramInfoLog(program));
+        console.error("program failed to link:" + gl.getProgramInfoLog(program));
     }
 
     return program;

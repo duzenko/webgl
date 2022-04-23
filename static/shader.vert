@@ -32,11 +32,12 @@ void main(void) {
     float xyBase = 0.7+innerRadius*cos(texCoord.x*twopi);
     gl_Position.x = xyBase*cos(texCoord.y*twopi);
     gl_Position.y = xyBase*sin(texCoord.y*twopi);
-    gl_Position.z = 0.2 * sin(texCoord.x * twopi);
+    gl_Position.z = innerRadius * sin(texCoord.x * twopi);
     //dbg = vec3(t/float(numt), 0, s / float(numc));
     texCoord.y *= 3.0; 
+    //texCoord /= 8.;
 #endif
     position = gl_Position.xyz;
-    gl_Position.z = 1.0 + gl_Position.z;
-    gl_Position.zw = vec2(gl_Position.z-1.0, gl_Position.z);
+    gl_Position.z = gl_Position.z+1.0;
+    gl_Position.zw = vec2(gl_Position.z-1., gl_Position.z);
 }
