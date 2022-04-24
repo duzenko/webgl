@@ -46,12 +46,11 @@ window.onload = async () => {
 }
 
 function step() {
-    const fps = document.querySelector("#fps") as HTMLSpanElement;
-    fps.textContent = getFPS()
+    const fps = document.querySelector("#fps") as HTMLSpanElement
+    const fpsText = getFPS()
+    fps.textContent = paused ? 'Paused' : fpsText
     const sizeSpan = document.querySelector("#size") as HTMLSpanElement;
-    sizeSpan.textContent = 'Size: ' + size
-    const checkbox = document.querySelector("#paused") as HTMLInputElement
-    checkbox.checked = paused
+    sizeSpan.textContent = 'Passes: ' + size
     const canvas = document.querySelector("#glCanvas") as HTMLCanvasElement;
     resizeCanvasToDisplaySize(canvas)
     gl.clearColor(0.0, 0.3 + 0 * new Date().getMilliseconds() / 1000, 0.0, 1.0)
@@ -91,6 +90,13 @@ function onKeyDown(e: KeyboardEvent) {
             break
         case 'ArrowRight':
             rotation--
+            break
+        case 'F1':
+            alert(`Press SPACE to toggle FPS benchmark
+W to toggle wireframe
+Arrow UP/DOWN to change number of passes
+Arrow LEFT/RIGHT to rotate
+`)
             break
         default:
             //console.log(e)
