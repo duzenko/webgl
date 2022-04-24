@@ -609,11 +609,10 @@ window.onload = function () {
 
 function step() {
   var fps = document.querySelector("#fps");
-  fps.textContent = fps_1.getFPS();
+  var fpsText = fps_1.getFPS();
+  fps.textContent = paused ? 'Paused' : fpsText;
   var sizeSpan = document.querySelector("#size");
-  sizeSpan.textContent = 'Size: ' + size;
-  var checkbox = document.querySelector("#paused");
-  checkbox.checked = paused;
+  sizeSpan.textContent = 'Passes: ' + size;
   var canvas = document.querySelector("#glCanvas");
   resizeCanvasToDisplaySize(canvas);
   exports.gl.clearColor(0.0, 0.3 + 0 * new Date().getMilliseconds() / 1000, 0.0, 1.0);
@@ -658,6 +657,10 @@ function onKeyDown(e) {
 
     case 'ArrowRight':
       rotation--;
+      break;
+
+    case 'F1':
+      alert("Press SPACE to toggle FPS benchmark\nW to toggle wireframe\nArrow UP/DOWN to change number of passes\nArrow LEFT/RIGHT to rotate\n");
       break;
 
     default: //console.log(e)
@@ -716,7 +719,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58115" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52165" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
