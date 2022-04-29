@@ -12,10 +12,10 @@ const uniforms: {
     aspectRatio?: WebGLUniformLocation
 } = {}
 
-let paused = true;
-let wireframe = false;
-let size = 32;
-let rotation = 0;
+let paused = true
+let wireframe = false
+let passes = 32*1
+let rotation = 99
 
 window.onload = async () => {
     document.addEventListener('keydown', onKeyDown)
@@ -39,8 +39,8 @@ window.onload = async () => {
         const texture = gl.createTexture()
         gl.bindTexture(gl.TEXTURE_2D, texture)
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR)
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
         gl.generateMipmap(gl.TEXTURE_2D);
         window.requestAnimationFrame(step)
     });
@@ -51,20 +51,20 @@ function step() {
     const fpsText = getFPS()
     fps.textContent = paused ? 'Paused' : fpsText
     const sizeSpan = document.querySelector("#size") as HTMLSpanElement;
-    sizeSpan.textContent = 'Passes: ' + size
+    sizeSpan.textContent = 'Passes: ' + passes
     const canvas = document.querySelector("#glCanvas") as HTMLCanvasElement;
     resizeCanvasToDisplaySize(canvas)
-    gl.clearColor(0.0, 0.3, 0.0, 1.0)
+    gl.clearColor(0.3, 0.3, 0.5, 1.0)
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-    gl.enable(gl.CULL_FACE);
+    // gl.enable(gl.CULL_FACE);
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.BLEND)
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-    gl.uniform1f(uniforms.slices!, size)
+    gl.uniform1f(uniforms.slices!, passes)
     gl.uniform1i(uniforms.torusDetail!, torusDetail)
     gl.uniform1f(uniforms.rotation!, rotation * 1e-2)
     gl.uniform1f(uniforms.aspectRatio!, canvas.width / canvas.height)
-    gl.drawArraysInstanced(wireframe ? gl.LINE_STRIP : gl.TRIANGLE_STRIP, 0, torusDetail * torusDetail * 6, size + 1)
+    gl.drawArraysInstanced(wireframe ? gl.LINE_STRIP : gl.TRIANGLE_STRIP, 0, torusDetail * torusDetail * 6, passes + 1)
     if (paused) return
     window.requestAnimationFrame(step);
 }
@@ -79,12 +79,16 @@ function onKeyDown(e: KeyboardEvent) {
             wireframe = !wireframe;
             break
         case 'ArrowUp':
-            //size *= 2
-            size++
+            if(passes>0)
+                passes *= 2
+            else
+                passes=1
             break
         case 'ArrowDown':
-            //if (size>1) size /= 2
-            if (size > 0) size--
+            if (passes > 1)
+                passes /= 2
+            else
+                passes=0
             break
         case 'ArrowLeft':
             rotation++

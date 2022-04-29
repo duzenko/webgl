@@ -16,7 +16,10 @@ const float torusRad2 = 0.2;
 const float twopi = 2.0 * 3.14159265358979323846;
 
 void main(void) {
-    height = float(gl_InstanceID)/max(slices, 1.0);
+    height = float(int(slices)-gl_InstanceID)/max(slices, 1.0);
+    if (height > 0.0) {
+//        height = sqrt(height); // try to sample more near the end
+    }
 #if 0
     texCoord.x = float(gl_VertexID % 2);
     texCoord.y = float(gl_VertexID / 2);
