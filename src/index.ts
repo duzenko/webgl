@@ -3,11 +3,7 @@ import { createProgramFromScripts } from './shaders'
 
 export var gl: WebGL2RenderingContext
 
-var paused = true
-var wireframe = false
-var size = 32
-var rotation = 0
-var torusDetail = 16
+const torusDetail = 16;
 
 const uniforms: {
     slices?: WebGLUniformLocation
@@ -15,6 +11,11 @@ const uniforms: {
     rotation?: WebGLUniformLocation
     aspectRatio?: WebGLUniformLocation
 } = {}
+
+let paused = true;
+let wireframe = false;
+let size = 32;
+let rotation = 0;
 
 window.onload = async () => {
     document.addEventListener('keydown', onKeyDown)
@@ -24,14 +25,14 @@ window.onload = async () => {
         alert("Unable to initialize WebGL. Your browser or machine may not support it.")
         return
     }
-    const prog = await createProgramFromScripts('shader')
-    if (!prog) return
-    gl.useProgram(prog)
-    uniforms.slices = gl.getUniformLocation(prog, 'slices')!
-    uniforms.torusDetail = gl.getUniformLocation(prog, 'torusDetail')!
-    uniforms.rotation = gl.getUniformLocation(prog, 'rotation')!
-    uniforms.aspectRatio = gl.getUniformLocation(prog, 'aspectRatio')!
-    var image = new Image();
+    const program = await createProgramFromScripts('shader')
+    if (!program) return
+    gl.useProgram(program)
+    uniforms.slices = gl.getUniformLocation(program, 'slices')!
+    uniforms.torusDetail = gl.getUniformLocation(program, 'torusDetail')!
+    uniforms.rotation = gl.getUniformLocation(program, 'rotation')!
+    uniforms.aspectRatio = gl.getUniformLocation(program, 'aspectRatio')!
+    const image = new Image();
     image.crossOrigin = 'anonymous'
     image.src = "https://upload.wikimedia.org/wikipedia/commons/9/9a/512x512_Dissolve_Noise_Texture.png"
     image.addEventListener('load', function () {
@@ -53,7 +54,7 @@ function step() {
     sizeSpan.textContent = 'Passes: ' + size
     const canvas = document.querySelector("#glCanvas") as HTMLCanvasElement;
     resizeCanvasToDisplaySize(canvas)
-    gl.clearColor(0.0, 0.3 + 0 * new Date().getMilliseconds() / 1000, 0.0, 1.0)
+    gl.clearColor(0.0, 0.3, 0.0, 1.0)
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
     gl.enable(gl.CULL_FACE);
     gl.enable(gl.DEPTH_TEST);
