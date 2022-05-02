@@ -123,6 +123,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.getFPS = void 0;
 var lastTime = new Date();
 var lastFps;
 var frames = 0;
@@ -146,6 +147,12 @@ exports.getFPS = getFPS;
 "use strict";
 
 var __awaiter = this && this.__awaiter || function (thisArg, _arguments, P, generator) {
+  function adopt(value) {
+    return value instanceof P ? value : new P(function (resolve) {
+      resolve(value);
+    });
+  }
+
   return new (P || (P = Promise))(function (resolve, reject) {
     function fulfilled(value) {
       try {
@@ -164,9 +171,7 @@ var __awaiter = this && this.__awaiter || function (thisArg, _arguments, P, gene
     }
 
     function step(result) {
-      result.done ? resolve(result.value) : new P(function (resolve) {
-        resolve(result.value);
-      }).then(fulfilled, rejected);
+      result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
     }
 
     step((generator = generator.apply(thisArg, _arguments || [])).next());
@@ -287,6 +292,7 @@ var __generator = this && this.__generator || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.createProgramFromScripts = void 0;
 
 var index_1 = require("./index");
 
@@ -401,6 +407,12 @@ exports.createProgramFromScripts = createProgramFromScripts;
 "use strict";
 
 var __awaiter = this && this.__awaiter || function (thisArg, _arguments, P, generator) {
+  function adopt(value) {
+    return value instanceof P ? value : new P(function (resolve) {
+      resolve(value);
+    });
+  }
+
   return new (P || (P = Promise))(function (resolve, reject) {
     function fulfilled(value) {
       try {
@@ -419,9 +431,7 @@ var __awaiter = this && this.__awaiter || function (thisArg, _arguments, P, gene
     }
 
     function step(result) {
-      result.done ? resolve(result.value) : new P(function (resolve) {
-        resolve(result.value);
-      }).then(fulfilled, rejected);
+      result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
     }
 
     step((generator = generator.apply(thisArg, _arguments || [])).next());
@@ -539,93 +549,83 @@ var __generator = this && this.__generator || function (thisArg, body) {
   }
 };
 
-var _this = this;
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.gl = void 0;
 
 var fps_1 = require("./fps");
 
 var shaders_1 = require("./shaders");
 
+var torusDetail = 160;
+var uniforms = {};
 var paused = true;
 var wireframe = false;
-var size = 32;
-var rotation = 0;
-var torusDetail = 16;
-var uniforms = {};
+var passes = 32 * 1;
+var rotation = 99 * 1;
 
 window.onload = function () {
-  return __awaiter(_this, void 0, void 0, function () {
-    var canvas, prog, image;
+  return __awaiter(void 0, void 0, void 0, function () {
+    var canvas, image;
     return __generator(this, function (_a) {
-      switch (_a.label) {
-        case 0:
-          document.addEventListener('keydown', onKeyDown);
-          canvas = document.querySelector("#glCanvas");
-          exports.gl = canvas.getContext("webgl2");
+      document.addEventListener('keydown', onKeyDown);
+      canvas = document.querySelector("#glCanvas");
+      exports.gl = canvas.getContext("webgl2");
 
-          if (exports.gl === null) {
-            alert("Unable to initialize WebGL. Your browser or machine may not support it.");
-            return [2
-            /*return*/
-            ];
-          }
-
-          return [4
-          /*yield*/
-          , shaders_1.createProgramFromScripts('shader')];
-
-        case 1:
-          prog = _a.sent();
-          if (!prog) return [2
-          /*return*/
-          ];
-          exports.gl.useProgram(prog);
-          uniforms.slices = exports.gl.getUniformLocation(prog, 'slices');
-          uniforms.torusDetail = exports.gl.getUniformLocation(prog, 'torusDetail');
-          uniforms.rotation = exports.gl.getUniformLocation(prog, 'rotation');
-          uniforms.aspectRatio = exports.gl.getUniformLocation(prog, 'aspectRatio');
-          image = new Image();
-          image.crossOrigin = 'anonymous';
-          image.src = "https://upload.wikimedia.org/wikipedia/commons/9/9a/512x512_Dissolve_Noise_Texture.png";
-          image.addEventListener('load', function () {
-            var texture = exports.gl.createTexture();
-            exports.gl.bindTexture(exports.gl.TEXTURE_2D, texture);
-            exports.gl.texImage2D(exports.gl.TEXTURE_2D, 0, exports.gl.RGBA, exports.gl.RGBA, exports.gl.UNSIGNED_BYTE, image);
-            exports.gl.texParameteri(exports.gl.TEXTURE_2D, exports.gl.TEXTURE_MIN_FILTER, exports.gl.NEAREST_MIPMAP_LINEAR);
-            exports.gl.texParameteri(exports.gl.TEXTURE_2D, exports.gl.TEXTURE_MAG_FILTER, exports.gl.NEAREST);
-            exports.gl.generateMipmap(exports.gl.TEXTURE_2D);
-            window.requestAnimationFrame(step);
-          });
-          return [2
-          /*return*/
-          ];
+      if (exports.gl === null) {
+        alert("Unable to initialize WebGL. Your browser or machine may not support it.");
+        return [2
+        /*return*/
+        ];
       }
+
+      image = new Image();
+      image.crossOrigin = 'anonymous';
+      image.src = "https://upload.wikimedia.org/wikipedia/commons/9/9a/512x512_Dissolve_Noise_Texture.png";
+      image.addEventListener('load', function () {
+        var texture = exports.gl.createTexture();
+        exports.gl.bindTexture(exports.gl.TEXTURE_2D, texture);
+        exports.gl.texImage2D(exports.gl.TEXTURE_2D, 0, exports.gl.RGBA, exports.gl.RGBA, exports.gl.UNSIGNED_BYTE, image);
+        exports.gl.texParameteri(exports.gl.TEXTURE_2D, exports.gl.TEXTURE_MIN_FILTER, exports.gl.LINEAR_MIPMAP_LINEAR);
+        exports.gl.texParameteri(exports.gl.TEXTURE_2D, exports.gl.TEXTURE_MAG_FILTER, exports.gl.LINEAR);
+        exports.gl.generateMipmap(exports.gl.TEXTURE_2D);
+        window.requestAnimationFrame(step);
+      });
+      (0, shaders_1.createProgramFromScripts)('shader').then(function (program) {
+        if (!program) return;
+        exports.gl.useProgram(program);
+        uniforms.slices = exports.gl.getUniformLocation(program, 'slices');
+        uniforms.torusDetail = exports.gl.getUniformLocation(program, 'torusDetail');
+        uniforms.rotation = exports.gl.getUniformLocation(program, 'rotation');
+        uniforms.aspectRatio = exports.gl.getUniformLocation(program, 'aspectRatio');
+      });
+      exports.gl.clearColor(0.3, 0.3, 0.5, 1.0);
+      exports.gl.enable(exports.gl.CULL_FACE);
+      exports.gl.enable(exports.gl.DEPTH_TEST);
+      exports.gl.enable(exports.gl.BLEND);
+      exports.gl.blendFunc(exports.gl.SRC_ALPHA, exports.gl.ONE_MINUS_SRC_ALPHA);
+      return [2
+      /*return*/
+      ];
     });
   });
 };
 
 function step() {
   var fps = document.querySelector("#fps");
-  var fpsText = fps_1.getFPS();
+  var fpsText = (0, fps_1.getFPS)();
   fps.textContent = paused ? 'Paused' : fpsText;
   var sizeSpan = document.querySelector("#size");
-  sizeSpan.textContent = 'Passes: ' + size;
+  sizeSpan.textContent = 'Passes: ' + passes;
   var canvas = document.querySelector("#glCanvas");
   resizeCanvasToDisplaySize(canvas);
-  exports.gl.clearColor(0.0, 0.3 + 0 * new Date().getMilliseconds() / 1000, 0.0, 1.0);
   exports.gl.clear(exports.gl.COLOR_BUFFER_BIT | exports.gl.DEPTH_BUFFER_BIT);
-  exports.gl.enable(exports.gl.CULL_FACE);
-  exports.gl.enable(exports.gl.DEPTH_TEST);
-  exports.gl.enable(exports.gl.BLEND);
-  exports.gl.blendFunc(exports.gl.SRC_ALPHA, exports.gl.ONE_MINUS_SRC_ALPHA);
-  exports.gl.uniform1f(uniforms.slices, size);
+  exports.gl.uniform1f(uniforms.slices, passes);
   exports.gl.uniform1i(uniforms.torusDetail, torusDetail);
   exports.gl.uniform1f(uniforms.rotation, rotation * 1e-2);
   exports.gl.uniform1f(uniforms.aspectRatio, canvas.width / canvas.height);
-  exports.gl.drawArraysInstanced(wireframe ? exports.gl.LINE_STRIP : exports.gl.TRIANGLE_STRIP, 0, torusDetail * torusDetail * 6, size + 1);
+  exports.gl.drawArraysInstanced(wireframe ? exports.gl.LINE_STRIP : exports.gl.TRIANGLE_STRIP, 0, torusDetail * torusDetail * 6, passes + 1);
   if (paused) return;
   window.requestAnimationFrame(step);
 }
@@ -642,13 +642,11 @@ function onKeyDown(e) {
       break;
 
     case 'ArrowUp':
-      //size *= 2
-      size++;
+      if (passes > 0) passes *= 2;else passes = 1;
       break;
 
     case 'ArrowDown':
-      //if (size>1) size /= 2
-      if (size > 0) size--;
+      if (passes > 1) passes /= 2;else passes = 0;
       break;
 
     case 'ArrowLeft':
@@ -719,7 +717,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52165" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62462" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
