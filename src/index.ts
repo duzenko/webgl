@@ -3,7 +3,7 @@ import { createProgramFromScripts } from './shaders'
 
 export var gl: WebGL2RenderingContext
 
-const torusDetail = 16;
+const torusDetail = 160;
 
 const uniforms: {
     slices?: WebGLUniformLocation
@@ -15,7 +15,7 @@ const uniforms: {
 let paused = true
 let wireframe = false
 let passes = 32*1
-let rotation = 99
+let rotation = 99*1
 
 window.onload = async () => {
     document.addEventListener('keydown', onKeyDown)
@@ -25,13 +25,6 @@ window.onload = async () => {
         alert("Unable to initialize WebGL. Your browser or machine may not support it.")
         return
     }
-    const program = await createProgramFromScripts('shader')
-    if (!program) return
-    gl.useProgram(program)
-    uniforms.slices = gl.getUniformLocation(program, 'slices')!
-    uniforms.torusDetail = gl.getUniformLocation(program, 'torusDetail')!
-    uniforms.rotation = gl.getUniformLocation(program, 'rotation')!
-    uniforms.aspectRatio = gl.getUniformLocation(program, 'aspectRatio')!
     const image = new Image();
     image.crossOrigin = 'anonymous'
     image.src = "https://upload.wikimedia.org/wikipedia/commons/9/9a/512x512_Dissolve_Noise_Texture.png"
@@ -44,6 +37,19 @@ window.onload = async () => {
         gl.generateMipmap(gl.TEXTURE_2D);
         window.requestAnimationFrame(step)
     });
+    createProgramFromScripts('shader').then( function(program) {
+        if (!program) return
+        gl.useProgram(program)
+        uniforms.slices = gl.getUniformLocation(program, 'slices')!
+        uniforms.torusDetail = gl.getUniformLocation(program, 'torusDetail')!
+        uniforms.rotation = gl.getUniformLocation(program, 'rotation')!
+        uniforms.aspectRatio = gl.getUniformLocation(program, 'aspectRatio')!
+    } )
+    gl.clearColor(0.3, 0.3, 0.5, 1.0)
+    gl.enable(gl.CULL_FACE);
+    gl.enable(gl.DEPTH_TEST);
+    gl.enable(gl.BLEND)
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 }
 
 function step() {
@@ -54,12 +60,7 @@ function step() {
     sizeSpan.textContent = 'Passes: ' + passes
     const canvas = document.querySelector("#glCanvas") as HTMLCanvasElement;
     resizeCanvasToDisplaySize(canvas)
-    gl.clearColor(0.3, 0.3, 0.5, 1.0)
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-    // gl.enable(gl.CULL_FACE);
-    gl.enable(gl.DEPTH_TEST);
-    gl.enable(gl.BLEND)
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
     gl.uniform1f(uniforms.slices!, passes)
     gl.uniform1i(uniforms.torusDetail!, torusDetail)
     gl.uniform1f(uniforms.rotation!, rotation * 1e-2)
