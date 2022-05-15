@@ -18,18 +18,20 @@ export const params = {
 }
 
 export async function init() {
-    // const image = new Image();
-    // image.crossOrigin = 'anonymous'
-    // image.src = "https://upload.wikimedia.org/wikipedia/commons/9/9a/512x512_Dissolve_Noise_Texture.png"
-    // image.addEventListener('load', function () {
-    //     const texture = gl.createTexture()
-    //     gl.bindTexture(gl.TEXTURE_2D, texture)
-    //     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)
-    //     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
-    //     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-    //     gl.generateMipmap(gl.TEXTURE_2D);
-    //     window.requestAnimationFrame(step)
-    // });
+
+    await new Promise<void>((resolve) => {
+        const image = new Image();
+        image.src = "fur.jpg"
+        image.onload = function () {
+            const texture = gl.createTexture()
+            gl.bindTexture(gl.TEXTURE_2D, texture)
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+            gl.generateMipmap(gl.TEXTURE_2D);
+            resolve()
+        }
+    })
     gl.clearColor(0.3, 0.3, 0.5, 1.0)
     gl.enable(gl.CULL_FACE);
     gl.enable(gl.DEPTH_TEST);

@@ -61,4 +61,5 @@ void main(void) {
 #else
     outColor.rgb *= sqrt(height)*0.5+0.5;
 #endif
+    outColor.rgb *= texture(u_texture, texCoord).rgb;
 }
