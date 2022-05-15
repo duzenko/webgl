@@ -50,6 +50,9 @@ export function frame(aspectRatio: number) {
     gl.uniform1i(uniforms.torusDetail!, torusDetail)
     gl.uniform1f(uniforms.rotation!, params.rotation * 1e-2)
     gl.uniform1f(uniforms.aspectRatio!, aspectRatio)
-    let count = torusDetail * torusDetail * 6
-    gl.drawArraysInstanced(params.wireframe ? gl.LINE_STRIP : gl.TRIANGLE_STRIP, 0, count, params.passes + 1)
+    gl.drawArraysInstanced(params.wireframe ? gl.LINE_STRIP : gl.TRIANGLE_STRIP, 0, getVertexCount(), params.passes + 1)
+}
+
+export function getVertexCount() {
+    return torusDetail * torusDetail * 6
 }

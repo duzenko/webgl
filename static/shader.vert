@@ -10,11 +10,13 @@ out vec2 texCoord;
 out vec3 positionLocal;
 out vec3 positionViewer;
 out vec3 normal;
+out vec3 tangent;
+out vec3 bitangent;
 out vec3 dbg;
 out float height;
 
-const float furHeight = 0.1;
-const float torusRad2 = 0.2;
+const float furHeight = 0.3;
+const float torusRad2 = 0.1;
 const float twopi = 2.0 * 3.14159265358979323846;
 
 void main(void) {
@@ -24,6 +26,7 @@ void main(void) {
     modelMatrix[2].y = sin(rotation);
     modelMatrix[2].z = cos(rotation);
     modelMatrix[2].w = 2.1;
+    vec4 viewPosInLocalSpace = vec4(0,0,0,1)*inverse(modelMatrix);
 
 #if 1
     height = float(int(slices)-gl_InstanceID)/max(slices, 1.0);
@@ -33,6 +36,9 @@ void main(void) {
 
     if (height > 0.0) {
         height = sqrt(height); // try to sample more near the end
+    }
+    if (height == 0.0) {
+//        height = 1.001;
     }
 
 #if 0
@@ -48,21 +54,21 @@ void main(void) {
     int k = gl_VertexID % 2;
     float s = float(i + k);
     float t = float(j);
-    texCoord.x = s / float(numc);
-    texCoord.y = t / float(numt-1);
-    normal.x = cos(texCoord.y*twopi)*cos(texCoord.x*twopi);
-    normal.y = sin(texCoord.y*twopi)*cos(texCoord.x*twopi);
-    normal.z = sin(texCoord.x*twopi);
-
-    vec4 viewPosInLocalSpace = vec4(0,0,0,1)*inverse(modelMatrix);
-
+    texCoord.x = s / float(numc) * twopi;
+    texCoord.y = t / float(numt-1) * twopi;
+    normal.x = cos(texCoord.y)*cos(texCoord.x);
+    normal.y = sin(texCoord.y)*cos(texCoord.x);
+    normal.z = sin(texCoord.x);
+    bitangent = vec3(cos(texCoord.y-twopi/4.0), sin(texCoord.y-twopi/4.0), 0.0);
+    tangent = cross(bitangent, normal);
     float innerRadius = torusRad2 + height * furHeight;
-    float xyBase = 0.7+innerRadius*cos(texCoord.x*twopi);
-    positionLocal.x = xyBase*cos(texCoord.y*twopi);
-    positionLocal.y = xyBase*sin(texCoord.y*twopi);
-    positionLocal.z = innerRadius * sin(texCoord.x * twopi);
+    float xyBase = 0.7+innerRadius*cos(texCoord.x);
+    positionLocal.x = xyBase*cos(texCoord.y);
+    positionLocal.y = xyBase*sin(texCoord.y);
+    positionLocal.z = innerRadius * sin(texCoord.x);
 
     texCoord.y *= 3.0;
+    texCoord /= twopi;
 
     vec3 toViewerInLocalSpace = normalize(viewPosInLocalSpace.xyz-1.0*positionLocal);
     float NdotV = dot(normal, toViewerInLocalSpace );

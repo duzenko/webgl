@@ -1,5 +1,5 @@
 import { getFPS } from './fps';
-import {frame, init, params} from "./3d";
+import {frame, getVertexCount, init, params} from "./3d";
 
 export var gl: WebGL2RenderingContext
 
@@ -16,11 +16,13 @@ window.onload = async () => {
 }
 
 function step() {
-    const fps = document.querySelector("#fps") as HTMLSpanElement
     const fpsText = getFPS()
-    fps.textContent = params.paused ? 'Paused' : fpsText
-    const sizeSpan = document.querySelector("#size") as HTMLSpanElement;
-    sizeSpan.textContent = 'Passes: ' + params.passes
+    const fpsElement = document.querySelector("#fps") as HTMLSpanElement
+    fpsElement.textContent = params.paused ? 'Paused' : fpsText
+    const passesElement = document.querySelector("#size") as HTMLSpanElement;
+    passesElement.textContent = 'Passes: ' + params.passes
+    const trianglesElement = document.querySelector("#triangles") as HTMLSpanElement;
+    trianglesElement.textContent = 'Triangles: ' + nFormatter(getVertexCount()/3)
     const canvas = document.querySelector("#glCanvas") as HTMLCanvasElement;
     resizeCanvasToDisplaySize(canvas)
     frame(canvas.width / canvas.height)
@@ -86,4 +88,21 @@ function resizeCanvasToDisplaySize(canvas: HTMLCanvasElement) {
     }
 
     return needResize;
+}
+
+function nFormatter(num: number, digits: number = 0) {
+    const lookup = [
+        { value: 1, symbol: "" },
+        { value: 1e3, symbol: "K" },
+        { value: 1e6, symbol: "M" },
+        { value: 1e9, symbol: "G" },
+        { value: 1e12, symbol: "T" },
+        { value: 1e15, symbol: "P" },
+        { value: 1e18, symbol: "E" }
+    ];
+    const rx = /\.0+$|(\.\d*[1-9])0+$/;
+    const item = lookup.slice().reverse().find(function(item) {
+        return num >= item.value;
+    });
+    return item ? (num / item.value).toFixed(digits).replace(rx, "$1") + item.symbol : "0";
 }

@@ -7,6 +7,8 @@ in vec3 positionLocal;
 in vec3 positionViewer;
 in vec3 dbg;
 in vec3 normal;
+in vec3 tangent;
+in vec3 bitangent;
 
 out vec4 outColor;
 
@@ -26,24 +28,23 @@ float rand(vec2 co) {
     if(int(round(co.x)) % 2 == 0) {
         co.y += 0.5;
     }
-    vec2 s = round(co);
-    float cell = 1.0;//step(distance(s, co), 0.4);
-#if 0
-    float random = fract(sin(dot(s, vec2(12.9898, 78.233))) * 43758.5453);
-    random = dot(s, vec2(12.9898, 78.233));
-    random = fract(fract(random) * 43758.5453);
-#else
-    uint n = baseHash(floatBitsToUint(round(co*6e0)));
+    uint n = baseHash(floatBitsToUint(round(co*1e0)));
     float random = float(n >> 1)/float(0x7fffffff);
-#endif
     float height = pow(random + 1e-4, 0.2);
-    return cell * height;
+    return height;
 }
 
 void main(void) {
-    float hairLength = rand(texCoord*1e2);
+    float hairLength = rand(texCoord*6e2);
     outColor = vec4(1.0);
+//    outColor.rgb = (tangent);
+//    return;
     if(height==0.0) {
+        outColor = vec4(0.0);
+        return;
+    }
+    if(height>1.0) {
+        outColor.a = 0.15;
         return;
     }
     float NdotV = dot(normalize(normal), normalize(-positionViewer));
@@ -59,6 +60,9 @@ void main(void) {
 #if 1
     outColor.rgb *= height*0.5+0.5;
 #else
-    outColor.rgb *= sqrt(height)*0.5+0.5;
+    outColor.rgb *= height;
 #endif
+
+    //    outColor.a *= NdotV;
+//    outColor.a *= 0.5;
 }
