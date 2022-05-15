@@ -9,6 +9,7 @@ uniform float aspectRatio;
 out vec2 texCoord;
 out vec3 positionLocal;
 out vec3 positionViewer;
+out vec3 toViewerInLocalSpace;
 out vec3 normal;
 out vec3 tangent;
 out vec3 bitangent;
@@ -35,7 +36,7 @@ void main(void) {
 #endif
 
     if (height > 0.0) {
-        height = sqrt(height); // try to sample more near the end
+//        height = sqrt(height); // try to sample more near the end
     }
     if (height == 0.0) {
 //        height = 1.001;
@@ -59,8 +60,8 @@ void main(void) {
     normal.x = cos(texCoord.y)*cos(texCoord.x);
     normal.y = sin(texCoord.y)*cos(texCoord.x);
     normal.z = sin(texCoord.x);
-    bitangent = vec3(cos(texCoord.y-twopi/4.0), sin(texCoord.y-twopi/4.0), 0.0);
-    tangent = cross(bitangent, normal);
+    bitangent = vec3(-sin(texCoord.y), cos(texCoord.y), 0.0);
+    tangent = cross(normal, bitangent);
     float innerRadius = torusRad2 + height * furHeight;
     float xyBase = 0.7+innerRadius*cos(texCoord.x);
     positionLocal.x = xyBase*cos(texCoord.y);
@@ -70,14 +71,14 @@ void main(void) {
     texCoord.y *= 3.0;
     texCoord /= twopi;
 
-    vec3 toViewerInLocalSpace = normalize(viewPosInLocalSpace.xyz-1.0*positionLocal);
+    toViewerInLocalSpace = normalize(viewPosInLocalSpace.xyz-1.0*positionLocal);
     float NdotV = dot(normal, toViewerInLocalSpace );
     dbg.x = clamp(5e0*(3e-1-NdotV), 0.0, 1.0);
 #endif
 
     // model transformation
     gl_Position = vec4(positionLocal, 1)*modelMatrix;
-    normal = normal*mat3(modelMatrix);
+//    normal = normal*mat3(modelMatrix);
     positionViewer = gl_Position.xyz;
     // perspective projection
     gl_Position.zw = vec2((gl_Position.z-1.0), gl_Position.z);

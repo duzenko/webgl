@@ -11,10 +11,10 @@ const uniforms: {
 } = {}
 
 export const params = {
-    paused: true,
+    paused: false,
     wireframe: false,
-    passes: 32*1,
-    rotation: 99*1
+    passes: 8*1,
+    rotation: 99*0
 }
 
 export async function init() {
